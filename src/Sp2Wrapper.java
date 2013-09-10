@@ -1,16 +1,29 @@
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonParser.NumberType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.rusticisoftware.tincan.Agent;
 import com.rusticisoftware.tincan.AgentActivity;
+import com.rusticisoftware.tincan.Context;
 import com.rusticisoftware.tincan.LanguageMap;
+import com.rusticisoftware.tincan.RemoteLRS;
+import com.rusticisoftware.tincan.Result;
 import com.rusticisoftware.tincan.Statement;
 import com.rusticisoftware.tincan.StatementRetreiver;
+import com.rusticisoftware.tincan.StatementsResult;
+import com.rusticisoftware.tincan.TCAPIVersion;
 import com.rusticisoftware.tincan.Verb;
+import com.rusticisoftware.tincan.v10x.StatementsQuery;
 
 
 
@@ -55,8 +68,20 @@ public class Sp2Wrapper {
 		.Password(password)
 		.GetStatements();
 		
-		System.out.println("from LRS, bob as object " + statements2.size());
+		System.out.println("from LRS, bob as object " + statements3.size());
 		
+		// TO access different fields, the classes have built in functions, below is an exmaple of how to get a few select fields
+		for (Statement statement : statements3) {
+			//Gets response from object
+			String response = (statement.getResult() == null) ? null : statement.getResult().getResponse();
+			// Gets success from object 
+			Boolean success = (statement.getResult() == null) ? null : statement.getResult().getSuccess();
+			
+			// Gets the plaformt for the object
+			String platform = (statement.getContext() == null) ? null : statement.getContext().getPlatform();
+			
+			System.out.println(String.format("%s , %s, %s", response, success, platform));
+		}		
 	}
 	
 	
@@ -121,13 +146,23 @@ public class Sp2Wrapper {
 			LanguageMap display = new LanguageMap();
 			display.put("en", "assessed");
 			verb.setDisplay(display);
-			verb.setId("http://www.example.com/VerbId");
+			verb.setId("http://www.example.com/VerbId4");
 			//
 			// object 
 			AgentActivity target = new AgentActivity();
 			target.setObjectType("Agent");
-			target.setMbox(theMaster.getMbox());
-			target.setName(theMaster.getName());
+			target.setMbox(angelBob.getMbox());
+			target.setName(angelBob.getName());
+			
+			//context
+			Context context = new Context();
+			context.setPlatform("Pilot Simulator");
+			
+			//Result
+			Result result = new Result();
+			result.setResponse("above");
+			result.setSuccess(true);
+			
 			//
 			Statement st = new Statement();
 			st.stamp(); // triggers a PUT -- sure?
@@ -135,28 +170,27 @@ public class Sp2Wrapper {
 			st.setActor(doctor);
 			st.setVerb(verb);
 			st.setObject(target);
-
-
-			getMaster.PostTestStatements(howMany, st);
-
+			st.setContext(context);
+			st.setResult(result);
+			getBob.PostTestStatements(howMany, st);
+			
 			// object 
-			AgentActivity otherTarget = new AgentActivity();
-			otherTarget.setObjectType("Agent");
-			otherTarget.setMbox(doctor.getMbox());
-			otherTarget.setName(doctor.getName());
-
-			Statement OtherStatement = new Statement();
-			OtherStatement.setActor(angelBob);
-			OtherStatement.setVerb(verb);
-			OtherStatement.setObject(otherTarget);
-			OtherStatement.stamp();
-
-			System.out.print(OtherStatement.getObject());
-
-			getDoctor.PostTestStatements(howMany, OtherStatement);
+//			AgentActivity otherTarget = new AgentActivity();
+//			otherTarget.setObjectType("Agent");
+//			otherTarget.setMbox(doctor.getMbox());
+//			otherTarget.setName(doctor.getName());
+//
+//			Statement OtherStatement = new Statement();
+//			OtherStatement.setActor(angelBob);
+//			OtherStatement.setVerb(verb);
+//			OtherStatement.setObject(otherTarget);
+//			OtherStatement.stamp();
+//
+//			System.out.print(OtherStatement.getObject());
+//
+//			getDoctor.PostTestStatements(howMany, OtherStatement);
 		}
 
-	
 		if (loadTest)
 		{
 			for (int i = 0; i < 1; i++) {
