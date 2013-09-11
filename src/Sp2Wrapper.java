@@ -48,7 +48,7 @@ public class Sp2Wrapper {
 		.TargetEmail(targetEmailExample1);
 
 		ArrayList<Statement> statements = getDoctor.GetStatements();
-		System.out.println("from LRS, bob as object " + statements.size());
+		System.out.println("from LRS, observer as object " + statements.size());
 		
 		// with setting the LRS creds
 		StatementRetreiver getBob = new StatementRetreiver()
@@ -58,7 +58,7 @@ public class Sp2Wrapper {
 		.Password(password);
 		
 		ArrayList<Statement> statements2 = getBob.GetStatements();
-		System.out.println("from LRS, bob as object " + statements2.size());
+		System.out.println("from LRS, pilot as object " + statements2.size());
 		
 		// one line -- define and get statements
 		ArrayList<Statement> statements3 = new StatementRetreiver()
@@ -68,7 +68,7 @@ public class Sp2Wrapper {
 		.Password(password)
 		.GetStatements();
 		
-		System.out.println("from LRS, bob as object " + statements3.size());
+		System.out.println("from LRS, pilot as object " + statements3.size());
 		
 		// TO access different fields, the classes have built in functions, below is an exmaple of how to get a few select fields
 		for (Statement statement : statements3) {
@@ -136,60 +136,6 @@ public class Sp2Wrapper {
 		.Endpoint(endpoint)
 		.Username(username)
 		.Password(password);
-
-
-		int howMany = 1; 
-		if (popTestData)
-		{	
-			//		// verb
-			Verb verb = new Verb();
-			LanguageMap display = new LanguageMap();
-			display.put("en", "assessed");
-			verb.setDisplay(display);
-			verb.setId("http://www.example.com/VerbId4");
-			//
-			// object 
-			AgentActivity target = new AgentActivity();
-			target.setObjectType("Agent");
-			target.setMbox(angelBob.getMbox());
-			target.setName(angelBob.getName());
-			
-			//context
-			Context context = new Context();
-			context.setPlatform("Pilot Simulator");
-			
-			//Result
-			Result result = new Result();
-			result.setResponse("above");
-			result.setSuccess(true);
-			
-			//
-			Statement st = new Statement();
-			st.stamp(); // triggers a PUT -- sure?
-
-			st.setActor(doctor);
-			st.setVerb(verb);
-			st.setObject(target);
-			st.setContext(context);
-			st.setResult(result);
-			getBob.PostTestStatements(howMany, st);
-			
-			// object 
-//			AgentActivity otherTarget = new AgentActivity();
-//			otherTarget.setObjectType("Agent");
-//			otherTarget.setMbox(doctor.getMbox());
-//			otherTarget.setName(doctor.getName());
-//
-//			Statement OtherStatement = new Statement();
-//			OtherStatement.setActor(angelBob);
-//			OtherStatement.setVerb(verb);
-//			OtherStatement.setObject(otherTarget);
-//			OtherStatement.stamp();
-//
-//			System.out.print(OtherStatement.getObject());
-//
-//			getDoctor.PostTestStatements(howMany, OtherStatement);
-		}
 
 		if (loadTest)
 		{
