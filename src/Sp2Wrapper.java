@@ -40,47 +40,51 @@ public class Sp2Wrapper {
 		String password = "lJLm0WQTwQwJQ8tZzeQV";
 		
 		//sample emails
-		String targetEmailExample1 = "mailto:observer@sp2.com";
+		String targetEmailExample1 = "mailto:jim.beam@us.army.mil";
 		String targetEmailExample2 = "pilot@sp2.com";		
 		
 		// with out setting the LRS creds
-		StatementRetreiver getDoctor= new StatementRetreiver()
+		StatementRetreiver getStatements1= new StatementRetreiver()
 		.TargetEmail(targetEmailExample1);
 
-		ArrayList<Statement> statements = getDoctor.GetStatements();
+		ArrayList<Statement> statements = getStatements1.GetStatements();
 		System.out.println("from LRS, observer as object " + statements.size());
 		
-		// with setting the LRS creds
-		StatementRetreiver getBob = new StatementRetreiver()
-		.TargetEmail(targetEmailExample2)
-		.Endpoint(endpoint)
-		.Username(username)
-		.Password(password);
-		
-		ArrayList<Statement> statements2 = getBob.GetStatements();
-		System.out.println("from LRS, pilot as object " + statements2.size());
-		
-		// one line -- define and get statements
-		ArrayList<Statement> statements3 = new StatementRetreiver()
-		.TargetEmail(targetEmailExample2)
-		.Endpoint(endpoint)
-		.Username(username)
-		.Password(password)
-		.GetStatements();
-		
-		System.out.println("from LRS, pilot as object " + statements3.size());
-		
 		// TO access different fields, the classes have built in functions, below is an exmaple of how to get a few select fields
-		for (Statement statement : statements3) {
+		for (Statement statement : statements) {
+			//Gets response from object
 			//Gets response from object
 			String response = (statement.getResult() == null) ? null : statement.getResult().getResponse();
-			// Gets success from object 
-			Boolean success = (statement.getResult() == null) ? null : statement.getResult().getSuccess();
+			String KSAName = "";
+			String eventName = "";
+			String eventDate = "";
+			if (statement.getContext() != null)
+			{
+				if (statement.getContext().getContextActivities() != null)
+				{
+					if (statement.getContext().getContextActivities().getGrouping() != null)
+					{
+						if (statement.getContext().getContextActivities().getGrouping().get(0) != null)
+						{	
+							if (statement.getContext().getContextActivities().getGrouping().get(0).getDefinition() != null)
+							{
+								if ( statement.getContext().getContextActivities().getGrouping().size() > 1)
+								{
+									KSAName = statement.getContext().getContextActivities().getGrouping().get(0).getDefinition().getName().get("en-us");
+									eventName = statement.getContext().getContextActivities().getGrouping().get(1).getDefinition().getName().get("en-us");
+									eventDate = statement.getContext().getContextActivities().getGrouping().get(1).getDefinition().getDescription().get("en-us");
+								}
+								else
+								{
+									KSAName = statement.getContext().getContextActivities().getGrouping().get(0).getDefinition().getName().get("en-us");
+								}
+							}
+						}
+					}
+				}
+			}			
 			
-			// Gets the plaformt for the object
-			String platform = (statement.getContext() == null) ? null : statement.getContext().getPlatform();
-			
-			System.out.println(String.format("%s , %s, %s", response, success, platform));
+			System.out.println(String.format("%s , %s,  %s, %s", response, KSAName, eventName, eventDate));
 		}		
 	}
 	
